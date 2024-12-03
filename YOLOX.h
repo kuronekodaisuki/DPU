@@ -6,13 +6,13 @@
 #ifndef __YOLOX_H__
 #define __YOLOX_H__
 
-#include "TensorRT.h"
+#include "DPU.hpp"
 #include "Object.h"
 
 #define NMS_THRESH 0.45f
 #define BBOX_CONF_THRESH 0.3f
 
-class API YOLOX : public TensorRT
+class API YOLOX : public DPU
 {
 public:
     /// <summary>

@@ -15,18 +15,7 @@ YOLOX::~YOLOX()
 
 bool YOLOX::LoadModel(const char* filepath, uint width, uint height, uint channels, PRECISION precision)
 {
-    if (TensorRT::LoadModel(filepath, width, height, channels, precision))
-    {
-        _grid_strides = generate_grids_and_stride();
-        return true;
-    }
-    else
-        return false;
-}
-
-bool YOLOX::LoadEngine(const char* filepath, uint width, uint height, uint channels)
-{
-    if (TensorRT::LoadEngine(filepath, width, height, channels))
+    if (Load(filepath, width, height, channels, precision))
     {
         _grid_strides = generate_grids_and_stride();
         return true;
