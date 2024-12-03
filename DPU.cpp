@@ -12,5 +12,35 @@ bool DPU::Load(const char* model_filename)
 
 void::DPU::Run(const char* images_filepath)
 {
-    
+    std::vector<string> image_filenames;
+    struct stat s;
+    lstat(images_filepath, &s);
+
+    if (S_IS_DIR(s.st_mode))
+    {
+        // Enumerate image file names
+        DIR* dir = opendir(images_filepath);
+        if (dir != nullptr)
+        {
+            for (struct dirent* entry = readdir(dir); entry != nullptr; entry = readdir(dir))
+            {
+                if ( entry->d_type == DT_REG || entry->d_type == DT_UNKNOWN)
+                {
+                    string name = entry->d_name;
+                    string ext = name.substr(name.find_last(".") + 1);
+                    switch (ext)
+                    {
+                        case "JPEG":
+                        case "JPG":
+                        case "jpeg":
+                        case "jpg":
+                        case "PNG":
+                        case "png":
+                        images.push_back(name);
+                    }
+                }
+            }
+            closedir(dir);
+        }
+    }
 }
