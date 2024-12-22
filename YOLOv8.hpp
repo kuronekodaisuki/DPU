@@ -38,7 +38,7 @@ protected:
 private:
     float _nms_threshold = NMS_THRESH;
     float _bbox_confidential_threshold = BBOX_CONF_THRESH;
-    uint _numClasses;
+    uint _numClasses = 80;
 
     std::vector<Object> _proposals;
     std::vector<Object> _objects;

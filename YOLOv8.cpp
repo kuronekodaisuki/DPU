@@ -12,7 +12,9 @@ YOLOv8::~YOLOv8()
 
 std::vector<std::vector<Object>> YOLOv8::Detect(std::vector<string> image_files)
 {
+    std::vector<std::vector<Object>> objects;
 
+    return objects;
 }
 
 std::vector<Object> YOLOv8::Detect(cv::Mat image)
@@ -45,7 +47,7 @@ void YOLOv8::generate_grids_and_stride()
             }
         }
     }
-    _numClasses = _outputShape[2] - 5;
+    //_numClasses = _outputShape[2] - 5;
 }
 
 void YOLOv8::generate_yolox_proposals(float prob_threshold)
@@ -61,11 +63,11 @@ void YOLOv8::generate_yolox_proposals(float prob_threshold)
         const size_t offset = anchor_idx * (_numClasses + 5);
 
         // yolox/models/yolo_head.py decode logic
-        float x_center = (_result[offset + 0] + grid0) * stride;
-        float y_center = (_output[offset + 1] + grid1) * stride;
-        float w = exp(_output[offset + 2]) * stride;
-        float h = exp(_output[offset + 3]) * stride;
-        float box_objectness = _output[offset + 4];
+        float x_center = (_results[offset + 0] + grid0) * stride;
+        float y_center = (_results[offset + 1] + grid1) * stride;
+        float w = exp(_results[offset + 2]) * stride;
+        float h = exp(_results[offset + 3]) * stride;
+        float box_objectness = _results[offset + 4];
 
         float x0 = x_center - w / 2;
         float y0 = y_center - h / 2;
@@ -74,7 +76,7 @@ void YOLOv8::generate_yolox_proposals(float prob_threshold)
 
         for (size_t class_idx = 0; class_idx < _numClasses; class_idx++)
         {
-            float box_cls_score = _output[offset + 5 + class_idx];
+            float box_cls_score = _results[offset + 5 + class_idx];
             float box_prob = box_objectness * box_cls_score;
             if (prob_threshold < box_prob)
             {
