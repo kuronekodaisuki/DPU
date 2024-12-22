@@ -31,9 +31,15 @@ bool DPU::Load(const char* model_filename)
     _inputShapes = new TensorShape[_inputTensors.size()];
     _outputShapes = new TensorShape[_outputTensors.size()];
 
+    _width = _inputShapes[0].width;
+    _height = _inputShapes[0].height;
+    _inSize = _inputShapes[0].size;
+    _outSize = _outputShapes[0].size;
+
     GraphInfo shapes = {_inputShapes, _outputShapes};
 
     getTensorShape(_runner.get(), &shapes, _inputTensors.size(), _outputTensors.size());
+
     return true;
 }
 
@@ -95,18 +101,40 @@ std::vector<string> DPU::Run(const char* images_filepath)
     return image_filenames;
 }
 
-int8_t* DPU::PreProcess(string filepath, std::vector<string> filenames)
+int8_t* DPU::PreProcess(string image_filename)
 {
-    int width = _inputShapes[0].width;
-    int height = _inputShapes[0].height;
-    int inSize = _inputShapes[0].size;
-    _outSize = _outputShapes[0].size;
-
-    float input_scale = get_input_scale(_inputTensors[0]);
+    _inputScale = get_input_scale(_inputTensors[0]);
     _outputScale = get_output_scale(_outputTensors[0]);
     float mean[3] = {104, 107, 123};
 
-    _inputBlob = new int8_t[filenames.size() * inSize];
+    _inputBlob = new int8_t[_inSize];
+    _results = new int8_t[_outSize];
+    
+    // Resize and convert to blob for each images
+    cv::Mat image = cv::imread(image_filename);
+    cv::Mat resized;
+    cv::resize(image, resized, cv::Size(_width, _height), 0, 0);
+    for (int h = 0; h < _height; h++)
+    {
+        for (int w = 0; w < _width; w++)
+        {
+            for (int c = 0; c < 3; c++)
+            {
+                _inputBlob[h * _width * 3 + w * 3 + c] = (int8_t)((resized.at<cv::Vec3b>(h, w)[c] - mean[c]) * _inputScale);
+            }
+        }
+    }
+
+    return _results;
+}
+
+int8_t* DPU::PreProcess(string filepath, std::vector<string> filenames)
+{
+    _inputScale = get_input_scale(_inputTensors[0]);
+    _outputScale = get_output_scale(_outputTensors[0]);
+    float mean[3] = {104, 107, 123};
+
+    _inputBlob = new int8_t[filenames.size() * _inSize];
     _results = new int8_t[filenames.size() * _outSize];
     
     // Resize and convert to blob for each images
@@ -114,14 +142,14 @@ int8_t* DPU::PreProcess(string filepath, std::vector<string> filenames)
     {
         cv::Mat image = cv::imread(filepath + filenames[i]);
         cv::Mat resized;
-        cv::resize(image, resized, cv::Size(width, height), 0, 0);
-        for (int h = 0; h < height; h++)
+        cv::resize(image, resized, cv::Size(_width, _height), 0, 0);
+        for (int h = 0; h < _height; h++)
         {
-            for (int w = 0; w < width; w++)
+            for (int w = 0; w < _width; w++)
             {
                 for (int c = 0; c < 3; c++)
                 {
-                    _inputBlob[i * inSize + h * width * 3 + w * 3 + c] = (int8_t)((resized.at<cv::Vec3b>(h, w)[c] - mean[c]) * input_scale);
+                    _inputBlob[i * _inSize + h * _width * 3 + w * 3 + c] = (int8_t)((resized.at<cv::Vec3b>(h, w)[c] - mean[c]) * _inputScale);
                 }
             }
         }

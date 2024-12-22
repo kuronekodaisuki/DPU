@@ -18,7 +18,9 @@ public:
     /// @return returns detected objects
     std::vector<Object> Detect(cv::Mat image);
 
-private:
+    std::vector<std::vector<Object>> Detect(std::vector<string> image_files);
+
+protected:
     struct GridAndStride
     {
         int grid0;
@@ -28,6 +30,12 @@ private:
         GridAndStride(int g0, int g1, int s) :grid0(g0), grid1(g1), stride(s) {}
     };
 
+    void postProcess(const int image_w, const int image_h, float scaleX, float scaleY);
+    void generate_grids_and_stride();
+    void generate_yolox_proposals(float prob_threshold);
+    void nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vector<int>& picked, float nms_threshold);
+
+private:
     float _nms_threshold = NMS_THRESH;
     float _bbox_confidential_threshold = BBOX_CONF_THRESH;
     uint _numClasses;
@@ -36,9 +44,5 @@ private:
     std::vector<Object> _objects;
 
     std::vector<GridAndStride> _grid_strides;
-    void postProcess(const int image_w, const int image_h, float scaleX, float scaleY);
-    std::vector<GridAndStride> generate_grids_and_stride();
-    void generate_yolox_proposals(float prob_threshold);
-    void nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vector<int>& picked, float nms_threshold);
 };
 

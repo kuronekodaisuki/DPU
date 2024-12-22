@@ -33,19 +33,30 @@ public :
     /// @return if succes return true
     bool Load(const char* model_filename);
 
+protected :
     /// @brief read images from images_filepath
     /// @param images_filepath 
     /// @return returns image filenames
     std::vector<string> Run(const char* images_filepath);
 
-protected :
     /// @brief Preprocess image files
     /// @param filepath 
     /// @param filenames 
     /// @return 
     int8_t* PreProcess(string filepath, std::vector<string> filenames);
 
+    int8_t* PreProcess(string image_filename);
+
 protected :
+    int _width;
+    int _height;
+    int _inSize;
+    int _outSize;
+    float _inputScale;
+    float _outputScale;
+    int8_t* _inputBlob;
+    int8_t* _results;
+
     std::unique_ptr<vart::Runner> _runner;
     TensorShape* _inputShapes;
     TensorShape* _outputShapes;
@@ -55,8 +66,4 @@ protected :
     std::vector<vart::TensorBuffer*> _outputBuffers;
     std::vector<std::unique_ptr<vart::TensorBuffer>> _inputs;
     std::vector<std::unique_ptr<vart::TensorBuffer>> _outputs;
-    int8_t* _inputBlob;
-    int8_t* _results;
-    int _outSize;
-    float _outputScale;
 };
