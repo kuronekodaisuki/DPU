@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*
- * Filename: yolov6.hpp
+ * Filename: yolov8.hpp
  *
  * Description:
  * This network is used to detecting objects from an image, it will return
@@ -32,10 +32,11 @@ namespace vitis {
 namespace ai {
 
 /**
- *@struct YOLOv6Result
- *@brief Struct of the result returned by the YOLOv6 neural network.
+ *@struct YOLOv8Result
+ *@brief Struct of the result returned by the YOLOv8 neural network.
  */
-struct YOLOv6Result {
+struct YOLOv8Result 
+{
   /**
    *@struct BoundingBox
    *@brief Struct of detection result with an object.
@@ -54,7 +55,7 @@ struct YOLOv6Result {
 };
 
 /**
- *@brief Post-process of the YOLOv6 neural network in batch mode.
+ *@brief Post-process of the YOLOv8 neural network in batch mode.
  *@param input_tensors A vector of all input-tensors in the network.
  * Usage: input_tensors[input_tensor_index].
  *@param output_tensors A vector of all output-tensors in the network.
@@ -66,9 +67,9 @@ struct YOLOv6Result {
  *@param top The vector of top padding position of network input size. Please
  see code for details.
 
- *@return The vector of struct of YOLOv6Result.
+ *@return The vector of struct of YOLOv8Result.
  */
-std::vector<YOLOv6Result> yolov6_post_process(
+std::vector<YOLOv8Result> yolov8_post_process(
     const std::vector<vitis::ai::library::InputTensor>& input_tensors,
     const std::vector<vitis::ai::library::OutputTensor>& output_tensors,
     const vitis::ai::proto::DpuModelParam& config,
@@ -78,7 +79,7 @@ std::vector<YOLOv6Result> yolov6_post_process(
 /**
  * @cond NOCOMMENTS
  */
-void yolov6_middle_process(
+void yolov8_middle_process(
     const vitis::ai::library::InputTensor& input_tensor,
     const vitis::ai::library::OutputTensor& output_tensor);
 
